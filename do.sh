@@ -9,7 +9,7 @@ echo "Enter port:"
 read port
 
 # Get identity from file
-identity=$(cat /var/lib/zerotier-one/identity.public)
+identity=$(cat identity.public)
 
 # Temporary file for modified mkworld.cpp
 temp_mkworld="mkworld_temp.cpp"
@@ -24,17 +24,17 @@ sed -i "/\/\/ mycustomserver/r /dev/stdin" "$temp_mkworld" <<EOF
      roots.back().stableEndpoints.push_back(InetAddress("$public_ip/$port"));
 EOF
 
-echo "Temporary mkworld.cpp updated successfully!"
+echo "Wait a moment..."
 
 mkdir -p bin
 c++ -std=c++11 -Isrc -Isrc/ext -I.. -g -o bin/mkworld src/node/C25519.cpp src/node/Salsa20.cpp src/node/SHA512.cpp src/node/Identity.cpp src/node/Utils.cpp src/node/InetAddress.cpp src/osdep/OSUtils.cpp mkworld.cpp -lm
 
 cd bin
 ./mkworld
-mv world.bin ../
+mv world.bin ../planet
 
 echo "Generate Done!"
-
+cd ../
 # Clean up temporary mkworld.cpp
 rm "$temp_mkworld"
-echo "Temporary mkworld.cpp removed."
+echo "Temporary Files Cleaned."
